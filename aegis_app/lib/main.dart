@@ -15,7 +15,7 @@ void main() async {
 }
 
 class AegisAIApp extends StatelessWidget {
-  const AegisAIApp({Key? key}) : super(key: key);
+  const AegisAIApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class AegisAIApp extends StatelessWidget {
 }
 
 class InitialScreen extends StatefulWidget {
-  const InitialScreen({Key? key}) : super(key: key);
+  const InitialScreen({super.key});
 
   @override
   State<InitialScreen> createState() => _InitialScreenState();

@@ -5,7 +5,7 @@ import 'sms_service.dart';
 /// Alert manager - handles sending alerts WITHOUT backend server
 /// All data stored locally, SMS sent directly from app
 class AlertManager {
-  /// Send alert to top 3 contacts
+  /// Send alert to top 6 contacts
   Future<bool> sendAlert({
     Position? position,
     String reason = 'High risk detected',
@@ -14,13 +14,16 @@ class AlertManager {
     try {
       print('🚨 Sending alert via SMS + WhatsApp...');
 
-      // Get top 3 contacts from local database
-      final contacts = LocalDatabase.getTopContacts();
-      
-      if (contacts.isEmpty) {
+      // Get top 6 contacts from local database
+      final allContacts = LocalDatabase.getTopContacts();
+
+      if (allContacts.isEmpty) {
         print('❌ No contacts found');
         return false;
       }
+
+      // Limit to only first 6 contacts
+      final contacts = allContacts.take(6).toList();
 
       // Get user phone
       final userPhone = LocalDatabase.getUserPhone() ?? 'User';
@@ -47,7 +50,8 @@ class AlertManager {
       });
 
       if (success) {
-        print('✅ Alert sent successfully to ${phoneNumbers.length} contacts (SMS + WhatsApp)');
+        print(
+            '✅ Alert sent successfully to ${phoneNumbers.length} contacts (SMS + WhatsApp)');
       } else {
         print('⚠️ Alert partially sent');
       }

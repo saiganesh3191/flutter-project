@@ -8,9 +8,9 @@ class AlertPopup extends StatefulWidget {
   final SensorService sensorService;
 
   const AlertPopup({
-    Key? key,
+    super.key,
     required this.sensorService,
-  }) : super(key: key);
+  });
 
   @override
   State<AlertPopup> createState() => _AlertPopupState();

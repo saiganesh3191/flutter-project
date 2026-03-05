@@ -6,10 +6,10 @@ class RiskMeter extends StatefulWidget {
   final String status;
 
   const RiskMeter({
-    Key? key,
+    super.key,
     required this.riskScore,
     required this.status,
-  }) : super(key: key);
+  });
 
   @override
   State<RiskMeter> createState() => _RiskMeterState();

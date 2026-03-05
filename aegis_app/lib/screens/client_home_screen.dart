@@ -3,7 +3,7 @@ import '../storage_service.dart';
 import 'login_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
-  const ClientHomeScreen({Key? key}) : super(key: key);
+  const ClientHomeScreen({super.key});
 
   @override
   State<ClientHomeScreen> createState() => _ClientHomeScreenState();
@@ -12,7 +12,7 @@ class ClientHomeScreen extends StatefulWidget {
 class _ClientHomeScreenState extends State<ClientHomeScreen> {
   final StorageService _storage = StorageService();
   String _userPhone = '';
-  List<Map<String, dynamic>> _alerts = [];
+  final List<Map<String, dynamic>> _alerts = [];
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   title: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.notifications_active, color: Colors.purple, size: 24),
+                      const Icon(Icons.notifications_active, color: Colors.purple, size: 24),
                       const SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,

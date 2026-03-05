@@ -10,8 +10,8 @@ class SmsService {
   static const String msg91SenderId = 'AEGSAI';
 
   // Twilio WhatsApp credentials
-  static const String twilioAccountSid = 'AC0ac44ad4accdefdbc4d0d8355c60be20';
-  static const String twilioAuthToken = '2b4bb1b3063d38e47746a1c3ccd14732';
+  static const String twilioAccountSid = 'ACff8549e7f6e392ac066408332cad0ef8';
+  static const String twilioAuthToken = '1764d39571b650dc23a7a1b1c81b05af';
   static const String twilioWhatsAppNumber = 'whatsapp:+14155238886';
 
   /// Send SMS + WhatsApp to multiple contacts
@@ -24,13 +24,14 @@ class SmsService {
       // Build Google Maps link
       String locationLink = 'Location unavailable';
       if (position != null) {
-        locationLink = 'https://maps.google.com/?q=${position.latitude},${position.longitude}';
+        locationLink =
+            'https://maps.google.com/?q=${position.latitude},${position.longitude}';
       }
 
       // Send to each contact (both SMS and WhatsApp)
       int smsSuccessCount = 0;
       int whatsappSuccessCount = 0;
-      
+
       for (final phone in phoneNumbers) {
         // Send SMS
         final smsSuccess = await _sendSingleSms(
@@ -50,8 +51,9 @@ class SmsService {
       }
 
       print('✅ SMS sent to $smsSuccessCount/${phoneNumbers.length} contacts');
-      print('✅ WhatsApp sent to $whatsappSuccessCount/${phoneNumbers.length} contacts');
-      
+      print(
+          '✅ WhatsApp sent to $whatsappSuccessCount/${phoneNumbers.length} contacts');
+
       return smsSuccessCount > 0 || whatsappSuccessCount > 0;
     } catch (e) {
       print('❌ Alert error: $e');
@@ -68,7 +70,7 @@ class SmsService {
     try {
       // Clean phone number
       final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
-      
+
       // Add country code if not present
       String finalPhone = cleanPhone;
       if (!cleanPhone.startsWith('+')) {
@@ -81,31 +83,34 @@ class SmsService {
 
       // MSG91 API endpoint (Route 4 - Transactional)
       final url = Uri.parse('https://control.msg91.com/api/v5/flow/');
-      
-      final response = await http.post(
-        url,
-        headers: {
-          'authkey': msg91AuthKey,
-          'content-type': 'application/json',
-        },
-        body: jsonEncode({
-          'template_id': msg91TemplateId,
-          'short_url': '0',
-          'recipients': [
-            {
-              'mobiles': finalPhone,
-              'var1': userName,
-              'var2': locationLink,
-            }
-          ],
-        }),
-      ).timeout(const Duration(seconds: 10));
+
+      final response = await http
+          .post(
+            url,
+            headers: {
+              'authkey': msg91AuthKey,
+              'content-type': 'application/json',
+            },
+            body: jsonEncode({
+              'template_id': msg91TemplateId,
+              'short_url': '0',
+              'recipients': [
+                {
+                  'mobiles': finalPhone,
+                  'var1': userName,
+                  'var2': locationLink,
+                }
+              ],
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         print('✅ SMS sent to $phone');
         return true;
       } else {
-        print('❌ SMS failed for $phone: ${response.statusCode} - ${response.body}');
+        print(
+            '❌ SMS failed for $phone: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {
@@ -123,7 +128,7 @@ class SmsService {
     try {
       // Clean phone number
       final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
-      
+
       // Add country code if not present
       String finalPhone = cleanPhone;
       if (!cleanPhone.startsWith('+')) {
@@ -150,7 +155,8 @@ class SmsService {
       );
 
       // Basic auth
-      final auth = base64Encode(utf8.encode('$twilioAccountSid:$twilioAuthToken'));
+      final auth =
+          base64Encode(utf8.encode('$twilioAccountSid:$twilioAuthToken'));
 
       final response = await http.post(
         url,
@@ -169,7 +175,8 @@ class SmsService {
         print('✅ WhatsApp sent to $phone');
         return true;
       } else {
-        print('❌ WhatsApp failed for $phone: ${response.statusCode} - ${response.body}');
+        print(
+            '❌ WhatsApp failed for $phone: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {

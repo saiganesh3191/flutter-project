@@ -150,7 +150,7 @@ class SensorService {
     if (_sampleCount % 100 == 0 && _startTime != null) {
       final elapsed = now.difference(_startTime!).inSeconds;
       final sampleRate = _sampleCount / elapsed;
-      print('📊 Stats: ${_sampleCount} samples, ${sampleRate.toStringAsFixed(1)} Hz, ${_highRiskCount} high-risk');
+      print('📊 Stats: $_sampleCount samples, ${sampleRate.toStringAsFixed(1)} Hz, $_highRiskCount high-risk');
     }
 
     _riskStreamController.add(RiskFrame(

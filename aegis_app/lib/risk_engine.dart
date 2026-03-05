@@ -461,9 +461,15 @@ class RiskEngine {
     _gyroHistory.addLast(gyroMag);
     _jerkHistory.addLast(jerk);
 
-    while (_accelHistory.length > _historySize) _accelHistory.removeFirst();
-    while (_gyroHistory.length > _historySize) _gyroHistory.removeFirst();
-    while (_jerkHistory.length > _historySize) _jerkHistory.removeFirst();
+    while (_accelHistory.length > _historySize) {
+      _accelHistory.removeFirst();
+    }
+    while (_gyroHistory.length > _historySize) {
+      _gyroHistory.removeFirst();
+    }
+    while (_jerkHistory.length > _historySize) {
+      _jerkHistory.removeFirst();
+    }
   }
 
   /// Detect false positives using multiple validation layers

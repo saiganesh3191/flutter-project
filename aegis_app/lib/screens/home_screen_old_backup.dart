@@ -14,7 +14,7 @@ import 'onboarding_screen.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -690,7 +690,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             )
           else
-            ..._contacts.take(3).map((contact) => _buildContactTile(contact)).toList(),
+            ..._contacts.take(3).map((contact) => _buildContactTile(contact)),
         ],
       ),
     );
@@ -813,7 +813,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-          )).toList(),
+          )),
         ],
       ),
     );

@@ -8,12 +8,12 @@ class AlertCountdownDialog extends StatelessWidget {
   final List<String> reasons;
 
   const AlertCountdownDialog({
-    Key? key,
+    super.key,
     required this.remainingSeconds,
     required this.onCancel,
     required this.score,
     required this.reasons,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +165,7 @@ class AlertCountdownDialog extends StatelessWidget {
                             ),
                           ],
                         ),
-                      )).toList(),
+                      )),
                     ],
                   ),
                 ),

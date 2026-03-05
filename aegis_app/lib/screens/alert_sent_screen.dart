@@ -5,9 +5,9 @@ class AlertSentScreen extends StatefulWidget {
   final bool success;
 
   const AlertSentScreen({
-    Key? key,
+    super.key,
     required this.success,
-  }) : super(key: key);
+  });
 
   @override
   State<AlertSentScreen> createState() => _AlertSentScreenState();
