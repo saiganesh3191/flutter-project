@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521917395359",
+    "project_id": "aegisai-492a2",
+    "storage_bucket": "aegisai-492a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521917395359:android:5d5c0c6909373a06530daa",
+        "android_client_info": {
+          "package_name": "com.aegisai.aegis_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpQEJ89Bn_VEd032nbmZ_nd9lpwExoASc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

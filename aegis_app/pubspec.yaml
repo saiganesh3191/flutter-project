@@ -1,0 +1,50 @@
+name: aegis_ai
+description: AegisAI - Predictive Personal Safety System
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase (for push notifications only)
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^17.0.0
+  
+  # Sensors and location
+  sensors_plus: ^4.0.0
+  geolocator: ^11.0.0
+  permission_handler: ^11.0.0
+  
+  # Local Database (like MongoDB but local)
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # SMS/WhatsApp sending (using url_launcher for SMS)
+  url_launcher: ^6.2.0
+  
+  # Storage
+  shared_preferences: ^2.2.0
+  
+  # HTTP (for MSG91 and Twilio APIs)
+  http: ^1.1.0
+  
+  # Background service
+  flutter_foreground_task: ^6.0.0
+  
+  # UUID for device ID
+  uuid: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  hive_generator: ^2.0.0
+  build_runner: ^2.4.0
+
+flutter:
+  uses-material-design: true
