@@ -45,9 +45,18 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   hive_generator: ^2.0.0
   build_runner: ^2.4.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
   
   assets:
     - lib/assets/app logo.jpeg
+
+# Flutter Launcher Icons Configuration
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "lib/assets/app logo.jpeg"
+  adaptive_icon_background: "#EF5350"
+  adaptive_icon_foreground: "lib/assets/app logo.jpeg"
