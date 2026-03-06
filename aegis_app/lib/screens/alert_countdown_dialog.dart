@@ -1,24 +1,63 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
-/// Alert countdown dialog with cancel button
-class AlertCountdownDialog extends StatelessWidget {
-  final int remainingSeconds;
+/// Alert countdown dialog with cancel button - updates countdown automatically
+class AlertCountdownDialog extends StatefulWidget {
+  final int initialSeconds;
   final VoidCallback onCancel;
   final int score;
   final List<String> reasons;
 
   const AlertCountdownDialog({
     super.key,
-    required this.remainingSeconds,
+    required this.initialSeconds,
     required this.onCancel,
     required this.score,
     required this.reasons,
   });
 
   @override
+  State<AlertCountdownDialog> createState() => _AlertCountdownDialogState();
+}
+
+class _AlertCountdownDialogState extends State<AlertCountdownDialog> {
+  late int remainingSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    remainingSeconds = widget.initialSeconds;
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
+      setState(() {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false, // Prevent back button dismiss
+    return PopScope(
+      canPop: false, // Prevent back button dismiss
       child: Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -117,7 +156,7 @@ class AlertCountdownDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'Risk Score: $score',
+                  'Risk Score: ${widget.score}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -129,7 +168,7 @@ class AlertCountdownDialog extends StatelessWidget {
               const SizedBox(height: 16),
               
               // Reasons
-              if (reasons.isNotEmpty) ...[
+              if (widget.reasons.isNotEmpty) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -148,7 +187,7 @@ class AlertCountdownDialog extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      ...reasons.take(3).map((reason) => Padding(
+                      ...widget.reasons.take(3).map((reason) => Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Row(
                           children: [
@@ -177,7 +216,7 @@ class AlertCountdownDialog extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: onCancel,
+                  onPressed: widget.onCancel,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.red.shade700,

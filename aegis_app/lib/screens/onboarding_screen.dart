@@ -14,9 +14,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // User's own phone number
   final TextEditingController _userPhoneController = TextEditingController();
   
-  // 5 contact slots with priority
-  final List<TextEditingController> _nameControllers = List.generate(5, (_) => TextEditingController());
-  final List<TextEditingController> _phoneControllers = List.generate(5, (_) => TextEditingController());
+  // 6 contact slots with priority
+  final List<TextEditingController> _nameControllers = List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _phoneControllers = List.generate(6, (_) => TextEditingController());
   
   bool _isLoading = false;
 
@@ -27,22 +27,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _loadExistingData() async {
-    // Load user phone from local database
-    final userPhone = LocalDatabase.getUserPhone();
-    if (userPhone != null) {
-      _userPhoneController.text = userPhone;
-    }
-    
-    // Load contacts from local database
-    final contacts = LocalDatabase.getContacts();
-    for (var contact in contacts) {
-      final priority = contact['priority'] as int;
-      final index = priority - 1; // Convert priority 1-5 to index 0-4
-      
-      if (index >= 0 && index < 5) {
-        _nameControllers[index].text = contact['name'] as String;
-        _phoneControllers[index].text = contact['phone'] as String;
+    try {
+      // Load user phone from local database
+      final userPhone = LocalDatabase.getUserPhone();
+      if (userPhone != null) {
+        _userPhoneController.text = userPhone;
       }
+      
+      // Load contacts from local database
+      final contacts = LocalDatabase.getContacts();
+      for (var contact in contacts) {
+        final priority = contact['priority'] as int;
+        final index = priority - 1; // Convert priority 1-6 to index 0-5
+        
+        // Safety check: only load if index is valid
+        if (index >= 0 && index < 6 && index < _nameControllers.length) {
+          _nameControllers[index].text = contact['name'] as String;
+          _phoneControllers[index].text = contact['phone'] as String;
+        }
+      }
+    } catch (e) {
+      print('Error loading existing data: $e');
+      // If there's an error, just start fresh
     }
   }
 
@@ -67,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     
     // Validate at least 1 contact
     int filledContacts = 0;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       if (_nameControllers[i].text.trim().isNotEmpty && _phoneControllers[i].text.trim().isNotEmpty) {
         filledContacts++;
       }
@@ -93,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       // Save contacts to local database
       final contacts = <Map<String, dynamic>>[];
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 6; i++) {
         final name = _nameControllers[i].text.trim();
         final phone = _phoneControllers[i].text.trim();
         
@@ -101,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           contacts.add({
             'name': name,
             'phone': phone,
-            'priority': i + 1, // Priority 1-5
+            'priority': i + 1, // Priority 1-6
           });
         }
       }
@@ -200,7 +206,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   
                   // Emergency contacts
                   const Text(
-                    'Emergency Contacts (Top 3 will receive alerts)',
+                    'Emergency Contacts (All 6 will receive alerts)',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -208,8 +214,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // 5 contact slots
-                  ...List.generate(5, (index) => _buildContactSlot(index)),
+                  // 6 contact slots
+                  ...List.generate(6, (index) => _buildContactSlot(index)),
                   
                   const SizedBox(height: 32),
                   
@@ -240,7 +246,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildContactSlot(int index) {
     final priority = index + 1;
-    final isTopPriority = priority <= 3;
+    final isTopPriority = priority <= 6; // All 6 contacts get alerts
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

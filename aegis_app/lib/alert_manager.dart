@@ -25,16 +25,20 @@ class AlertManager {
       // Limit to only first 6 contacts
       final contacts = allContacts.take(6).toList();
 
-      // Get user phone
-      final userPhone = LocalDatabase.getUserPhone() ?? 'User';
+      // Get user name and phone
+      final userName = LocalDatabase.getUserName() ?? 'User';
+      final userPhone = LocalDatabase.getUserPhone() ?? '';
 
-      // Extract phone numbers
+      // Extract phone numbers and names
       final phoneNumbers = contacts.map((c) => c['phone'] as String).toList();
+      final contactNames = contacts.map((c) => c['name'] as String).toList();
 
       // Send SMS + WhatsApp to all contacts
       final success = await SmsService.sendAlertSms(
         phoneNumbers: phoneNumbers,
-        userName: userPhone,
+        contactNames: contactNames,
+        userName: userName,
+        userPhone: userPhone,
         position: position,
       );
 

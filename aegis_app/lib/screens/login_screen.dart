@@ -12,18 +12,26 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
   String _selectedRole = 'admin'; // 'admin' or 'contact'
 
   @override
   void dispose() {
+    _nameController.dispose();
     _phoneController.dispose();
     super.dispose();
   }
 
   Future<void> _login() async {
+    final name = _nameController.text.trim();
     final phone = _phoneController.text.trim().replaceAll(' ', '').replaceAll('-', '');
+    
+    if (name.isEmpty) {
+      _showMessage('Please enter your name');
+      return;
+    }
     
     if (phone.isEmpty) {
       _showMessage('Please enter your phone number');
@@ -34,8 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       if (_selectedRole == 'admin') {
-        // Admin login - save role and phone, go to onboarding
+        // Admin login - save role, name, and phone, go to onboarding
         await LocalDatabase.saveUserRole('admin');
+        await LocalDatabase.saveUserName(name);
         await LocalDatabase.saveUserPhone(phone);
         
         // Generate device ID if not exists
@@ -57,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
         if (isContact) {
           await LocalDatabase.saveUserRole('contact');
+          await LocalDatabase.saveUserName(name);
           await LocalDatabase.saveUserPhone(phone);
           
           if (mounted) {
@@ -122,10 +132,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.shield,
-                      size: 60,
-                      color: Colors.red,
+                    child: ClipOval(
+                      child: Image.asset(
+                        'lib/assets/app logo.jpeg',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   
@@ -212,6 +225,33 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         
                         const SizedBox(height: 24),
+                        
+                        // Name input
+                        const Text(
+                          'Name',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your name',
+                            prefixIcon: const Icon(Icons.person),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                          keyboardType: TextInputType.name,
+                          textCapitalization: TextCapitalization.words,
+                        ),
+                        
+                        const SizedBox(height: 16),
                         
                         // Phone input
                         const Text(

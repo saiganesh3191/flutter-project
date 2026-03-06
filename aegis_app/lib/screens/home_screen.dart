@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<Map<String, dynamic>> _contacts = [];
   String _userPhone = '';
   AlertStage _alertStage = AlertStage.idle;
+  bool _isDialogShowing = false;
   TimeMode _timeMode = TimeMode.day;
   
   StreamSubscription? _riskSubscription;
@@ -160,12 +161,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         _timeMode = status.timeMode; // Update time mode
       });
 
-      // Show countdown dialog when arming
-      if (status.stage == AlertStage.arming) {
+      // Show countdown dialog when arming (only once)
+      if (status.stage == AlertStage.arming && !_isDialogShowing) {
+        _isDialogShowing = true;
         _showCountdownDialog(status);
       } 
       // Dismiss dialog and show confirmation when triggered
       else if (status.stage == AlertStage.triggered) {
+        _isDialogShowing = false;
         Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
         _showAlertSentConfirmation();
       }
@@ -173,17 +176,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _showCountdownDialog(AlertStatus status) {
-    // Check if dialog is already showing
-    if (ModalRoute.of(context)?.isCurrent == false) return;
-    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertCountdownDialog(
-        remainingSeconds: status.remainingCancelSeconds,
+        initialSeconds: status.remainingCancelSeconds,
         score: status.score,
         reasons: status.reasons,
         onCancel: () {
+          _isDialogShowing = false;
           _orchestrator.cancelArming();
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(

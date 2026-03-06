@@ -10,14 +10,21 @@ class SmsService {
   static const String msg91SenderId = 'AEGSAI';
 
   // Twilio WhatsApp credentials
-  static const String twilioAccountSid = 'ACff8549e7f6e392ac066408332cad0ef8';
-  static const String twilioAuthToken = '1764d39571b650dc23a7a1b1c81b05af';
+  // Get your credentials from: https://www.twilio.com/console
+  // Sign up at: https://www.twilio.com/try-twilio
+  static const String twilioAccountSid = 'AC0ac44ad4accdefdbc4d0d8355c60be20';
+  static const String twilioAuthToken = '45502d301b4ea7bc25695f50d7f703c0';
   static const String twilioWhatsAppNumber = 'whatsapp:+14155238886';
+  
+  // Set to false to disable WhatsApp if you don't have valid credentials
+  static const bool enableWhatsApp = true;
 
   /// Send SMS + WhatsApp to multiple contacts
   static Future<bool> sendAlertSms({
     required List<String> phoneNumbers,
+    required List<String> contactNames,
     required String userName,
+    required String userPhone,
     Position? position,
   }) async {
     try {
@@ -32,27 +39,39 @@ class SmsService {
       int smsSuccessCount = 0;
       int whatsappSuccessCount = 0;
 
-      for (final phone in phoneNumbers) {
-        // Send SMS
+      for (int i = 0; i < phoneNumbers.length; i++) {
+        final phone = phoneNumbers[i];
+        final contactName = i < contactNames.length ? contactNames[i] : 'Contact';
+        
+        // Send SMS (always)
         final smsSuccess = await _sendSingleSms(
           phone: phone,
+          contactName: contactName,
           userName: userName,
+          userPhone: userPhone,
           locationLink: locationLink,
         );
         if (smsSuccess) smsSuccessCount++;
 
-        // Send WhatsApp
-        final whatsappSuccess = await _sendWhatsApp(
-          phone: phone,
-          userName: userName,
-          locationLink: locationLink,
-        );
-        if (whatsappSuccess) whatsappSuccessCount++;
+        // Send WhatsApp (only if enabled)
+        if (enableWhatsApp) {
+          final whatsappSuccess = await _sendWhatsApp(
+            phone: phone,
+            contactName: contactName,
+            userName: userName,
+            userPhone: userPhone,
+            locationLink: locationLink,
+          );
+          if (whatsappSuccess) whatsappSuccessCount++;
+        }
       }
 
       print('✅ SMS sent to $smsSuccessCount/${phoneNumbers.length} contacts');
-      print(
-          '✅ WhatsApp sent to $whatsappSuccessCount/${phoneNumbers.length} contacts');
+      if (enableWhatsApp) {
+        print('✅ WhatsApp sent to $whatsappSuccessCount/${phoneNumbers.length} contacts');
+      } else {
+        print('ℹ️ WhatsApp disabled - update Twilio credentials to enable');
+      }
 
       return smsSuccessCount > 0 || whatsappSuccessCount > 0;
     } catch (e) {
@@ -64,7 +83,9 @@ class SmsService {
   /// Send SMS to single contact using MSG91 API
   static Future<bool> _sendSingleSms({
     required String phone,
+    required String contactName,
     required String userName,
+    required String userPhone,
     required String locationLink,
   }) async {
     try {
@@ -97,8 +118,10 @@ class SmsService {
               'recipients': [
                 {
                   'mobiles': finalPhone,
-                  'var1': userName,
-                  'var2': locationLink,
+                  'var1': contactName,
+                  'var2': userName,
+                  'var3': userPhone,
+                  'var4': locationLink,
                 }
               ],
             }),
@@ -122,7 +145,9 @@ class SmsService {
   /// WhatsApp message using Twilio API
   static Future<bool> _sendWhatsApp({
     required String phone,
+    required String contactName,
     required String userName,
+    required String userPhone,
     required String locationLink,
   }) async {
     try {
@@ -142,9 +167,10 @@ class SmsService {
       // WhatsApp number format
       final whatsappTo = 'whatsapp:$finalPhone';
 
-      // Build message
+      // Build message with contact name
       final message = '🚨 *EMERGENCY ALERT*\n\n'
-          'Alert from: *$userName*\n\n'
+          'Hi $contactName,\n\n'
+          'Alert from: *$userName* ($userPhone)\n\n'
           '⚠️ High risk situation detected!\n\n'
           '📍 Location: $locationLink\n\n'
           'Please check on them immediately!';

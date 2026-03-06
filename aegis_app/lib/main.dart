@@ -87,13 +87,28 @@ class _InitialScreenState extends State<InitialScreen> {
               colors: [Colors.red.shade400, Colors.red.shade700],
             ),
           ),
-          child: const Center(
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.shield, size: 80, color: Colors.white),
-                SizedBox(height: 24),
-                CircularProgressIndicator(color: Colors.white),
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'lib/assets/app logo.jpeg',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const CircularProgressIndicator(color: Colors.white),
               ],
             ),
           ),

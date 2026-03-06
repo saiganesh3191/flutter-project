@@ -16,17 +16,20 @@ class LocalDatabase {
     await Hive.openBox(_alertsBox);
     await Hive.openBox(_settingsBox);
     
+    // Migrate old data if needed
+    await migrateContactsIfNeeded();
+    
     print('✅ Local database initialized');
   }
 
   // ==================== CONTACTS ====================
   
-  /// Save contacts (max 5)
+  /// Save contacts (max 6)
   static Future<void> saveContacts(List<Map<String, dynamic>> contacts) async {
     final box = Hive.box(_contactsBox);
     await box.clear(); // Clear old contacts
     
-    for (int i = 0; i < contacts.length && i < 5; i++) {
+    for (int i = 0; i < contacts.length && i < 6; i++) {
       await box.put('contact_$i', contacts[i]);
     }
     
@@ -38,23 +41,29 @@ class LocalDatabase {
     final box = Hive.box(_contactsBox);
     final contacts = <Map<String, dynamic>>[];
     
-    for (int i = 0; i < 5; i++) {
-      final contact = box.get('contact_$i');
-      if (contact != null) {
-        contacts.add(Map<String, dynamic>.from(contact));
+    try {
+      for (int i = 0; i < 6; i++) {
+        final contact = box.get('contact_$i');
+        if (contact != null) {
+          contacts.add(Map<String, dynamic>.from(contact));
+        }
       }
+      
+      // Sort by priority
+      contacts.sort((a, b) => (a['priority'] as int).compareTo(b['priority'] as int));
+    } catch (e) {
+      print('Error loading contacts: $e');
+      // If there's an error, return empty list
+      return [];
     }
-    
-    // Sort by priority
-    contacts.sort((a, b) => (a['priority'] as int).compareTo(b['priority'] as int));
     
     return contacts;
   }
 
-  /// Get top 3 priority contacts
+  /// Get top 6 priority contacts (all contacts)
   static List<Map<String, dynamic>> getTopContacts() {
     final contacts = getContacts();
-    return contacts.take(3).toList();
+    return contacts.take(6).toList();
   }
 
   /// Check if phone number exists as contact
@@ -118,6 +127,18 @@ class LocalDatabase {
     return box.get('user_phone');
   }
 
+  /// Save user name
+  static Future<void> saveUserName(String name) async {
+    final box = Hive.box(_settingsBox);
+    await box.put('user_name', name);
+  }
+
+  /// Get user name
+  static String? getUserName() {
+    final box = Hive.box(_settingsBox);
+    return box.get('user_name');
+  }
+
   /// Save user role (admin or contact)
   static Future<void> saveUserRole(String role) async {
     final box = Hive.box(_settingsBox);
@@ -163,5 +184,44 @@ class LocalDatabase {
     await Hive.box(_settingsBox).clear();
     
     print('✅ All local data cleared');
+  }
+  
+  /// Migrate old 5-contact data to 6-contact format
+  static Future<void> migrateContactsIfNeeded() async {
+    try {
+      final box = Hive.box(_contactsBox);
+      
+      // Check if we have any contacts
+      bool hasOldData = false;
+      for (int i = 0; i < 10; i++) {
+        if (box.get('contact_$i') != null) {
+          hasOldData = true;
+          break;
+        }
+      }
+      
+      if (hasOldData) {
+        // Load all existing contacts
+        final contacts = <Map<String, dynamic>>[];
+        for (int i = 0; i < 10; i++) {
+          final contact = box.get('contact_$i');
+          if (contact != null) {
+            try {
+              contacts.add(Map<String, dynamic>.from(contact));
+            } catch (e) {
+              print('Skipping corrupted contact at index $i');
+            }
+          }
+        }
+        
+        // Clear and re-save with proper format
+        await box.clear();
+        await saveContacts(contacts);
+        
+        print('✅ Migrated ${contacts.length} contacts to new format');
+      }
+    } catch (e) {
+      print('Migration error: $e');
+    }
   }
 }
